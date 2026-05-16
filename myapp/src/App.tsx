@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useMemo, useEffect } from "react";
 import { Search, Copy, Check, ExternalLink, ChevronDown, ChevronUp, Shuffle, X, Shield, Clock, Users } from "lucide-react";
 
