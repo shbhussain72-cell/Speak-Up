@@ -1,6 +1,28 @@
-// @ts-nocheck
 import { useState, useMemo, useEffect } from "react";
 import { Search, Copy, Check, ExternalLink, ChevronDown, ChevronUp, Shuffle, X, Shield, Clock, Users } from "lucide-react";
+
+interface DealCode {
+  [key: string]: any;
+}
+interface Deal {
+  id: string;
+  brand: string;
+  product: string;
+  desc: string;
+  category: string;
+  orig: string;
+  disc: string;
+  saved: string;
+  pct: number;
+  r: number;
+  rv: string;
+  min: string;
+  exp: string;
+  use: string;
+  hot: boolean;
+  codes: DealCode[];
+  url: string;
+}
 
 // ── Palette ──────────────────────────────────────────────────────────────────
 const C = { bg:"#F1F5F9",card:"#fff",border:"#E2E8F0",hdr:"#0D1117",
@@ -12,7 +34,7 @@ const CAT_A = { Tech:"#2563EB",Fashion:"#7C3AED",Food:"#EA580C",
   "AI Tools":"#7C3AED",Gaming:"#DC2626",Health:"#16A34A" };
 
 // ── Data ─────────────────────────────────────────────────────────────────────
-const D = [
+/* const D = [
   // TECH
   {id:"t1",brand:"Apple",product:"MacBook Air M3",desc:"13-inch · M3 chip · 8GB RAM · 256GB SSD · Midnight",category:"Tech",
    orig:"₹1,14,900",disc:"₹91,920",saved:"₹22,980",pct:20,r:4.8,rv:"12.4k",min:"₹50,000",exp:"31 Dec 2025",use:"3.2k",hot:true,
@@ -133,6 +155,180 @@ const D = [
   {id:"h3",brand:"PharmEasy",product:"Medicine & Healthcare",desc:"Prescription & OTC medicines · Lab tests · Free delivery above ₹500",category:"Health",
    orig:"₹1,000",disc:"₹750",saved:"₹250",pct:25,r:4.2,rv:"567k",min:"₹500",exp:"31 Mar 2026",use:"14.3k",
    codes:[{c:"PHARME25",d:"25% OFF"},{c:"PHARMDEAL20",d:"20% OFF"},{c:"PHFREE15",d:"15% OFF"}],url:"https://pharmeasy.in"},
+*/
+
+const D: Deal[] = [
+  // TECH
+  {id:"t1",brand:"Apple",product:"MacBook Air M3",desc:"13-inch · M3 chip · 8GB RAM · 256GB SSD · Midnight",category:"Tech",
+   orig:"₹1,14,900",disc:"₹91,920",saved:"₹22,980",pct:20,r:4.8,rv:"12.4k",min:"₹50,000",exp:"31 Dec 2025",use:"3.2k",hot:true,
+   codes:[{c:"APPLEM3200",d:"20% OFF"},{c:"STDNT15MAC",d:"15% OFF"},{c:"APPLECARE10",d:"10% OFF"},{c:"AAPL5BACK",d:"5% Cashback"}],url:"https://apple.com"},
+  {id:"t2",brand:"Samsung",product:"Galaxy S25 Ultra",desc:"6.9\" QHD+ AMOLED · 200MP OIS · Snapdragon 8 Elite · Titanium",category:"Tech",
+   orig:"₹1,29,999",disc:"₹90,999",saved:"₹39,000",pct:30,r:4.7,rv:"8.9k",min:"₹80,000",exp:"15 Jan 2026",use:"5.7k",hot:true,
+   codes:[{c:"SAMGS25ULTRA",d:"30% OFF"},{c:"SAMSUNG25",d:"25% OFF"},{c:"GALXY20",d:"20% OFF"},{c:"SAMOFF15",d:"15% OFF"},{c:"SAM10EXTRA",d:"10% OFF"}],url:"https://samsung.com"},
+  {
+    id: "t3", brand: "Sony", product: "WH-1000XM5 Headphones", desc: "Industry-leading ANC · 30hr battery · Multipoint connect · Foldable", category: "Tech",
+    orig: "₹29,990", disc: "₹23,992", saved: "₹5,998", pct: 20, r: 4.6, rv: "6.1k", min: "₹10,000", exp: "28 Feb 2026", use: "1.9k",
+    codes: [{ c: "SONY20ANC", d: "20% OFF" }, { c: "SONYHP15", d: "15% OFF" }, { c: "SONYXM10", d: "10% OFF" }], url: "https://sony.com",
+    hot: false
+  },
+  {id:"t4",brand:"boAt",product:"Airdopes 441 Pro",desc:"ANC · 42hr playtime · BEAST™ Mode · Low-latency gaming audio",category:"Tech",
+   orig:"₹3,499",disc:"₹1,749",saved:"₹1,750",pct:50,r:4.3,rv:"22.1k",min:"₹999",exp:"10 Jan 2026",use:"8.4k",hot:true,
+   codes:[{c:"BOATFEST50",d:"50% OFF"},{c:"BOATDEAL35",d:"35% OFF"},{c:"BOAT20",d:"20% OFF"},{c:"BOATAUDIO15",d:"15% OFF"}],url:"https://boat-lifestyle.com"},
+  {
+    id: "t5", brand: "Dell", product: "XPS 15 Laptop", desc: "Intel i7-13th Gen · 16GB RAM · 512GB SSD · OLED 3.5K Touch", category: "Tech",
+    orig: "₹1,89,999", disc: "₹1,51,999", saved: "₹38,000", pct: 20, r: 4.5, rv: "3.2k", min: "₹1,00,000", exp: "31 Mar 2026", use: "980",
+    codes: [{ c: "DELLXPS20", d: "20% OFF" }, { c: "DELLFEST15", d: "15% OFF" }, { c: "DELL10NOW", d: "10% OFF" }], url: "https://dell.com",
+    hot: false
+  },
+  {
+    id: "t6", brand: "Xiaomi", product: "Redmi Note 14 Pro", desc: "200MP OIS · 120W HyperCharge · 6.67\" AMOLED 120Hz · IP68", category: "Tech",
+    orig: "₹27,999", disc: "₹19,599", saved: "₹8,400", pct: 30, r: 4.4, rv: "18.7k", min: "₹10,000", exp: "20 Jan 2026", use: "12.3k",
+    codes: [{ c: "MI30NOTE14", d: "30% OFF" }, { c: "MIFLASH20", d: "20% OFF" }, { c: "MI2KOFF", d: "₹2,000 OFF" }, { c: "MIFAN15", d: "15% OFF" }], url: "https://mi.com/in",
+    hot: false
+  },
+  {
+    id: "t7", brand: "OnePlus", product: "OnePlus 13", desc: "Snapdragon 8 Elite · Hasselblad cameras · 100W SUPERVOOC · 6000mAh", category: "Tech",
+    orig: "₹69,999", disc: "₹55,999", saved: "₹14,000", pct: 20, r: 4.6, rv: "9.3k", min: "₹30,000", exp: "31 Jan 2026", use: "6.5k",
+    codes: [{ c: "OP13LAUNCH", d: "20% OFF" }, { c: "OP13DEAL", d: "15% OFF" }, { c: "OP10RED", d: "10% OFF" }], url: "https://oneplus.in",
+    hot: false
+  },
+  // FASHION
+  {id:"f1",brand:"Nike",product:"Air Max 270",desc:"Lightweight mesh upper · Max Air heel unit · Men's & Women's sizes",category:"Fashion",
+   orig:"₹12,995",disc:"₹9,746",saved:"₹3,249",pct:25,r:4.6,rv:"31.2k",min:"₹5,000",exp:"30 Jan 2026",use:"7.8k",hot:true,
+   codes:[{c:"NIKE25RUN",d:"25% OFF"},{c:"NIKEAIR20",d:"20% OFF"},{c:"NKFRIENDS15",d:"15% OFF"},{c:"NIKEMOVE10",d:"10% OFF"}],url:"https://nike.com"},
+  {
+    id: "f2", brand: "Adidas", product: "Ultraboost 24", desc: "BOOST midsole · Primeknit+ upper · Continental™ rubber outsole", category: "Fashion",
+    orig: "₹14,999", disc: "₹10,499", saved: "₹4,500", pct: 30, r: 4.7, rv: "14.5k", min: "₹6,000", exp: "28 Feb 2026", use: "4.3k",
+    codes: [{ c: "ADICLUB30", d: "30% OFF" }, { c: "ADICREATOR20", d: "20% OFF" }, { c: "ADI15", d: "15% OFF" }, { c: "ADIDAS10X", d: "10% OFF" }], url: "https://adidas.com",
+    hot: false
+  },
+  {
+    id: "f3", brand: "Zara", product: "Summer Collection 2025", desc: "Linen shirts · Printed dresses · Resort shorts — All sizes in stock", category: "Fashion",
+    orig: "₹5,990", disc: "₹2,995", saved: "₹2,995", pct: 50, r: 4.2, rv: "5.6k", min: "₹1,500", exp: "30 Jun 2025", use: "9.1k",
+    codes: [{ c: "ZARASALE50", d: "50% OFF" }, { c: "ZARANEW30", d: "30% OFF" }, { c: "ZARA20SS", d: "20% OFF" }], url: "https://zara.com",
+    hot: false
+  },
+  {
+    id: "f4", brand: "Levi's", product: "511 Slim Fit Jeans", desc: "Slim from hip to ankle · Stretch denim · Classic 5-pocket styling", category: "Fashion",
+    orig: "₹4,999", disc: "₹2,999", saved: "₹2,000", pct: 40, r: 4.5, rv: "28.3k", min: "₹2,000", exp: "31 Jan 2026", use: "14.2k",
+    codes: [{ c: "LEVIS40", d: "40% OFF" }, { c: "LEVISDENIM25", d: "25% OFF" }, { c: "LEVI15", d: "15% OFF" }, { c: "LEVIS10", d: "10% OFF" }], url: "https://levis.com",
+    hot: false
+  },
+  {id:"f5",brand:"Puma",product:"Running Shoes Collection",desc:"NITRO foam · PUMAGRIP outsole · Multiple styles available",category:"Fashion",
+   orig:"₹8,999",disc:"₹5,399",saved:"₹3,600",pct:40,r:4.4,rv:"9.7k",min:"₹4,000",exp:"15 Feb 2026",use:"5.5k",hot:true,
+   codes:[{c:"PUMASHOP40",d:"40% OFF"},{c:"PUMA30RUN",d:"30% OFF"},{c:"PUMA20",d:"20% OFF"},{c:"PUMACAT10",d:"10% OFF"}],url:"https://puma.com"},
+  // FOOD
+  {id:"fd1",brand:"Zomato",product:"Any Restaurant Order",desc:"Valid at 10,000+ restaurants · Max discount ₹120 · All cities",category:"Food",
+   orig:"₹600",disc:"₹240",saved:"₹360",pct:60,r:4.3,rv:"2.1M",min:"₹149",exp:"31 Dec 2025",use:"45.2k",hot:true,
+   codes:[{c:"ZOMGOLD60",d:"60% OFF"},{c:"ZOMFRESH50",d:"50% OFF"},{c:"ZOM30",d:"30% OFF"},{c:"ZOMFREE15",d:"15% OFF"},{c:"ZOM10EXTRA",d:"10% OFF"}],url:"https://zomato.com"},
+  {id:"fd2",brand:"Swiggy",product:"Any Restaurant Order",desc:"500+ restaurants · Free delivery included · Instamart eligible",category:"Food",
+   orig:"₹500",disc:"₹250",saved:"₹250",pct:50,r:4.2,rv:"1.8M",min:"₹199",exp:"31 Dec 2025",use:"38.7k",hot:true,
+   codes:[{c:"SWIGMAX50",d:"50% OFF"},{c:"SWIGFEAST40",d:"40% OFF"},{c:"SWIGGOLD30",d:"30% OFF"},{c:"SWIG15",d:"15% OFF"}],url:"https://swiggy.com"},
+  {
+    id: "fd3", brand: "Domino's", product: "Large Pizza (Any Crust)", desc: "Thin crust · New Hand Tossed · Cheese Burst — Delivery & dine-in", category: "Food",
+    orig: "₹499", disc: "₹349", saved: "₹150", pct: 30, r: 4.1, rv: "890k", min: "₹299", exp: "28 Feb 2026", use: "22.1k",
+    codes: [{ c: "DOM30NOW", d: "30% OFF" }, { c: "DOMWEEKEND25", d: "25% OFF" }, { c: "PIZZADOM20", d: "20% OFF" }, { c: "DOM15", d: "15% OFF" }], url: "https://dominos.com",
+    hot: false
+  },
+  {
+    id: "fd4", brand: "Starbucks", product: "Handcrafted Beverages", desc: "All sizes · Hot & cold · Valid at company-owned stores", category: "Food",
+    orig: "₹550", disc: "₹275", saved: "₹275", pct: 50, r: 4.4, rv: "124k", min: "₹0", exp: "30 Jun 2026", use: "8.3k",
+    codes: [{ c: "SBUXBOGO", d: "Buy 1 Get 1" }, { c: "SBUX25OFF", d: "25% OFF" }, { c: "SBUX15", d: "15% OFF" }], url: "https://starbucks.com",
+    hot: false
+  },
+  {
+    id: "fd5", brand: "BigBasket", product: "Grocery Order ₹500+", desc: "Fresh produce · Staples · Packaged goods — Same day delivery", category: "Food",
+    orig: "₹800", disc: "₹560", saved: "₹240", pct: 30, r: 4.2, rv: "567k", min: "₹500", exp: "31 Jan 2026", use: "18.9k",
+    codes: [{ c: "BBDROP30", d: "30% OFF" }, { c: "BBFRESH20", d: "20% OFF" }, { c: "BBDEAL15", d: "15% OFF" }], url: "https://bigbasket.com",
+    hot: false
+  },
+  // TRAVEL
+  {id:"tr1",brand:"MakeMyTrip",product:"Domestic Flights",desc:"All airlines · All routes · Instant confirmation · Flexible fares",category:"Travel",
+   orig:"₹8,500",disc:"₹5,950",saved:"₹2,550",pct:30,r:4.3,rv:"421k",min:"₹3,000",exp:"31 Mar 2026",use:"11.4k",hot:true,
+   codes:[{c:"MMT30FLY",d:"30% OFF"},{c:"MMT2500OFF",d:"₹2,500 OFF"},{c:"MMTAIR15",d:"15% OFF"},{c:"MMTNEW10",d:"10% OFF"}],url:"https://makemytrip.com"},
+  {id:"tr2",brand:"OYO",product:"Weekend Hotel Stay",desc:"3000+ hotels · Free breakfast at select properties · Instant booking",category:"Travel",
+   orig:"₹2,499",disc:"₹1,249",saved:"₹1,250",pct:50,r:3.9,rv:"892k",min:"₹800",exp:"30 Jun 2026",use:"19.6k",hot:true,
+   codes:[{c:"OYO50STAY",d:"50% OFF"},{c:"OYO35WKND",d:"35% OFF"},{c:"OYOFLEX20",d:"20% OFF"},{c:"OYO10NEW",d:"10% OFF"}],url:"https://oyorooms.com"},
+  {
+    id: "tr3", brand: "Airbnb", product: "First International Stay", desc: "Valid on first booking outside India · Entire homes & private rooms", category: "Travel",
+    orig: "$150", disc: "$100", saved: "$50", pct: 33, r: 4.7, rv: "2.4M", min: "$100", exp: "31 Dec 2025", use: "4.1k",
+    codes: [{ c: "AIRBNB50", d: "$50 OFF" }, { c: "AIRFIRST30", d: "30% OFF" }, { c: "AIR15NEW", d: "15% OFF" }], url: "https://airbnb.com",
+    hot: false
+  },
+  // E-COMMERCE
+  {id:"ec1",brand:"Ajio",product:"Branded Fashion",desc:"Puma, Levis, Nike, H&M, Reebok & 500+ brands · Free delivery",category:"E-commerce",
+   orig:"₹3,999",disc:"₹1,999",saved:"₹2,000",pct:50,r:4.2,rv:"234k",min:"₹1,500",exp:"31 Dec 2025",use:"16.4k",hot:true,
+   codes:[{c:"AJIO50",d:"50% OFF"},{c:"AJIO40X10",d:"40%+10% OFF"},{c:"AJIOBIG30",d:"30% OFF"},{c:"AJIO20",d:"20% OFF"}],url:"https://ajio.com"},
+  {id:"ec2",brand:"Flipkart",product:"Electronics & Fashion",desc:"Mobiles, laptops, appliances, fashion — Big Billion Days offer",category:"E-commerce",
+   orig:"₹5,000",disc:"₹3,250",saved:"₹1,750",pct:35,r:4.3,rv:"1.2M",min:"₹2,000",exp:"15 Jan 2026",use:"28.9k",hot:true,
+   codes:[{c:"FKSUPER35",d:"35% OFF"},{c:"FKBIG25",d:"25% OFF"},{c:"FLIPKART15",d:"15% OFF"},{c:"FK10EXTRA",d:"10% OFF"}],url:"https://flipkart.com"},
+  {
+    id: "ec3", brand: "Amazon India", product: "Electronics Sitewide", desc: "Laptops, phones, headphones, TVs — Next-day delivery on Prime", category: "E-commerce",
+    orig: "₹10,000", disc: "₹8,500", saved: "₹1,500", pct: 15, r: 4.5, rv: "3.1M", min: "₹5,000", exp: "31 Mar 2026", use: "42.3k",
+    codes: [{ c: "AMZNOW15", d: "15% OFF" }, { c: "AMZPRIME10", d: "10% OFF" }, { c: "AMAZON5", d: "5% OFF" }], url: "https://amazon.in",
+    hot: false
+  },
+  // COURSES
+  {id:"c1",brand:"Udemy",product:"Any Online Course",desc:"180,000+ courses · Tech, design, business — Lifetime access",category:"Courses",
+   orig:"₹3,499",disc:"₹349",saved:"₹3,150",pct:90,r:4.6,rv:"18.9M",min:"₹0",exp:"31 Dec 2025",use:"89.4k",hot:true,
+   codes:[{c:"UDEMY90",d:"90% OFF"},{c:"ULEARN80",d:"80% OFF"},{c:"UDEMY70",d:"70% OFF"},{c:"UFRIDAY50",d:"50% OFF"},{c:"UDEMY30",d:"30% OFF"}],url:"https://udemy.com"},
+  {id:"c2",brand:"Coursera",product:"Coursera Plus Annual",desc:"7,000+ courses, professional certificates & degrees — All-access",category:"Courses",
+   orig:"₹4,999",disc:"₹1,499",saved:"₹3,500",pct:70,r:4.7,rv:"3.2M",min:"₹0",exp:"31 Dec 2025",use:"21.3k",hot:true,
+   codes:[{c:"COURSE70",d:"70% OFF"},{c:"LEARNPLUS50",d:"50% OFF"},{c:"CPLUS30",d:"30% OFF"},{c:"CERA20NEW",d:"20% OFF"}],url:"https://coursera.org"},
+  {
+    id: "c3", brand: "Skillshare", product: "Annual Membership", desc: "10,000+ creative & business classes · Download for offline use", category: "Courses",
+    orig: "$167", disc: "$67", saved: "$100", pct: 60, r: 4.4, rv: "823k", min: "$0", exp: "30 Jun 2026", use: "6.2k",
+    codes: [{ c: "SKILL60", d: "60% OFF" }, { c: "SKANNUAL40", d: "40% OFF" }, { c: "SKILLS25", d: "25% OFF" }], url: "https://skillshare.com",
+    hot: false
+  },
+  {
+    id: "c4", brand: "Unacademy", product: "Iconic Subscription", desc: "UPSC, JEE, NEET & more · Live classes · Study material · Mock tests", category: "Courses",
+    orig: "₹8,999", disc: "₹4,499", saved: "₹4,500", pct: 50, r: 4.2, rv: "1.1M", min: "₹0", exp: "31 Mar 2026", use: "14.8k",
+    codes: [{ c: "UNA50ICONIC", d: "50% OFF" }, { c: "UNALEAP30", d: "30% OFF" }, { c: "UNAPLUS20", d: "20% OFF" }], url: "https://unacademy.com",
+    hot: false
+  },
+  // AI TOOLS
+  {id:"ai1",brand:"Canva Pro",product:"Annual Subscription",desc:"100M+ templates · AI design tools · Brand Kit · Background Remover",category:"AI Tools",
+   orig:"₹5,999",disc:"₹2,999",saved:"₹3,000",pct:50,r:4.8,rv:"2.7M",min:"₹0",exp:"31 Mar 2026",use:"31.2k",hot:true,
+   codes:[{c:"CANVAPRO50",d:"50% OFF"},{c:"CANVA30PRO",d:"30% OFF"},{c:"CANVATEAM20",d:"20% OFF"},{c:"CANVA15",d:"15% OFF"}],url:"https://canva.com"},
+  {id:"ai2",brand:"Notion AI",product:"Annual Plan",desc:"AI workspace · Notes, docs, wikis, databases — All in one place",category:"AI Tools",
+   orig:"$96",disc:"$48",saved:"$48",pct:50,r:4.7,rv:"891k",min:"₹0",exp:"28 Feb 2026",use:"8.1k",hot:true,
+   codes:[{c:"NOTIONAI50",d:"50% OFF"},{c:"NOTION30AI",d:"30% OFF"},{c:"NTNANNUAL20",d:"20% OFF"}],url:"https://notion.so"},
+  {id:"ai3",brand:"ChatGPT Plus",product:"Monthly Subscription",desc:"GPT-4o · Advanced reasoning · Image generation · Priority access",category:"AI Tools",
+   orig:"$20",disc:"$14",saved:"$6",pct:30,r:4.9,rv:"4.2M",min:"₹0",exp:"31 Jan 2026",use:"19.7k",hot:true,
+   codes:[{c:"GPT30DEAL",d:"30% OFF"},{c:"CHATGPT20",d:"20% OFF"},{c:"GPT15OFF",d:"15% OFF"}],url:"https://chat.openai.com"},
+  {
+    id: "ai4", brand: "Grammarly Premium", product: "Annual Plan", desc: "AI writing assistant · Grammar, clarity, tone & plagiarism detection", category: "AI Tools",
+    orig: "$144", disc: "$72", saved: "$72", pct: 50, r: 4.6, rv: "1.4M", min: "₹0", exp: "31 Dec 2025", use: "12.4k",
+    codes: [{ c: "GRAM50YEAR", d: "50% OFF" }, { c: "GRAMPRO30", d: "30% OFF" }, { c: "GRAMLY20", d: "20% OFF" }], url: "https://grammarly.com",
+    hot: false
+  },
+  // GAMING
+  {id:"g1",brand:"Xbox Game Pass",product:"Ultimate — 3 Months",desc:"300+ games · EA Play included · Cloud gaming · Xbox Live Gold",category:"Gaming",
+   orig:"$44.99",disc:"$1",saved:"$43.99",pct:98,r:4.7,rv:"567k",min:"₹0",exp:"31 Jan 2026",use:"28.3k",hot:true,
+   codes:[{c:"XBOXPASS1",d:"Trial — $1"},{c:"XBGP50",d:"50% OFF"},{c:"GAMEPASS30",d:"30% OFF"},{c:"XBOX20OFF",d:"20% OFF"}],url:"https://xbox.com"},
+  {id:"g2",brand:"Steam",product:"Game Sale Bundle",desc:"Top AAA titles + indie gems · DLCs included · Windows & Mac",category:"Gaming",
+   orig:"₹4,999",disc:"₹1,499",saved:"₹3,500",pct:70,r:4.8,rv:"3.4M",min:"₹0",exp:"15 Jan 2026",use:"41.2k",hot:true,
+   codes:[{c:"STEAM70NOW",d:"70% OFF"},{c:"STEAMWINTER50",d:"50% OFF"},{c:"GAMER30",d:"30% OFF"},{c:"STEAM15G",d:"15% OFF"}],url:"https://store.steampowered.com"},
+  {id:"g3",brand:"PlayStation",product:"PS Plus Extra — Annual",desc:"400+ PS4 & PS5 games · Online multiplayer · 100GB cloud storage",category:"Gaming",
+   orig:"$134.99",disc:"$94.49",saved:"$40.50",pct:30,r:4.5,rv:"789k",min:"₹0",exp:"31 Mar 2026",use:"9.8k",hot:true,
+   codes:[{c:"PSPLUS30",d:"30% OFF"},{c:"PSGOLD20",d:"20% OFF"},{c:"PS15EXTRA",d:"15% OFF"}],url:"https://playstation.com"},
+  // HEALTH
+  {id:"h1",brand:"Cult.fit",product:"Monthly Membership",desc:"Unlimited gym, yoga, HIIT, cycle & boxing at 1000+ centres",category:"Health",
+   orig:"₹2,499",disc:"₹1,249",saved:"₹1,250",pct:50,r:4.4,rv:"312k",min:"₹0",exp:"31 Jan 2026",use:"7.6k",hot:true,
+   codes:[{c:"CULTFIT50",d:"50% OFF"},{c:"CULTJOIN30",d:"30% OFF"},{c:"CULT20",d:"20% OFF"}],url:"https://cult.fit"},
+  {
+    id: "h2", brand: "Healthkart", product: "Protein Supplements", desc: "MuscleBlaze, GNC, Optimum Nutrition — Whey & Mass Gainer", category: "Health",
+    orig: "₹3,499", disc: "₹2,099", saved: "₹1,400", pct: 40, r: 4.3, rv: "189k", min: "₹1,000", exp: "28 Feb 2026", use: "5.2k",
+    codes: [{ c: "HK40PROTEIN", d: "40% OFF" }, { c: "HKFIT25", d: "25% OFF" }, { c: "HEALTH15", d: "15% OFF" }, { c: "HK10MRP", d: "10% OFF" }], url: "https://healthkart.com",
+    hot: false
+  },
+  {
+    id: "h3", brand: "PharmEasy", product: "Medicine & Healthcare", desc: "Prescription & OTC medicines · Lab tests · Free delivery above ₹500", category: "Health",
+    orig: "₹1,000", disc: "₹750", saved: "₹250", pct: 25, r: 4.2, rv: "567k", min: "₹500", exp: "31 Mar 2026", use: "14.3k",
+    codes: [{ c: "PHARME25", d: "25% OFF" }, { c: "PHARMDEAL20", d: "20% OFF" }, { c: "PHFREE15", d: "15% OFF" }], url: "https://pharmeasy.in",
+    hot: false
+  },
 ];
 
 const HOT = D.filter(x=>x.hot).sort((a,b)=>b.pct-a.pct);
@@ -151,7 +347,7 @@ function Logo() {
   );
 }
 
-function Stars({ r }) {
+function Stars({ r }: { r: number }) {
   const full = Math.round(r);
   return (
     <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
@@ -163,7 +359,7 @@ function Stars({ r }) {
   );
 }
 
-function CopyBtn({ code }) {
+function CopyBtn({ code }: { code: string }) {
   const [ok, setOk] = useState(false);
   const go = () => { navigator.clipboard.writeText(code).catch(()=>{}); setOk(true); setTimeout(()=>setOk(false),2000); };
   return (
@@ -177,7 +373,7 @@ function CopyBtn({ code }) {
   );
 }
 
-function CodeRow({ entry, url }) {
+function CodeRow({ entry, url }: { entry: DealCode; url: string }) {
   return (
     <div style={{display:"flex",alignItems:"center",gap:7,padding:"7px 10px",borderRadius:6,
       background:"#F8FAFC",border:"1px solid #E2E8F0",marginBottom:5,flexWrap:"wrap"}}>
@@ -197,9 +393,9 @@ function CodeRow({ entry, url }) {
   );
 }
 
-function DealCard({ deal }) {
+function DealCard({ deal }: { deal: Deal }) {
   const [exp, setExp] = useState(false);
-  const ac = CAT_A[deal.category]||C.accent;
+  const ac = CAT_A[deal.category as keyof typeof CAT_A]||C.accent;
   const top = deal.codes[0]; const rest = deal.codes.slice(1);
   return (
     <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:8,overflow:"hidden",
@@ -246,7 +442,7 @@ function DealCard({ deal }) {
               {exp?<ChevronUp size={12}/>:<ChevronDown size={12}/>}
               {exp?"Hide codes":`Show ${rest.length} more code${rest.length>1?"s":""}`}
             </button>
-            {exp&&<div style={{marginTop:6}}>{rest.map((en,i)=><CodeRow key={i} entry={en} url={deal.url}/>)}</div>}
+            {exp&&<div style={{marginTop:6}}>{rest.map((en: DealCode, i: number)=><CodeRow key={i} entry={en} url={deal.url}/>)}</div>}
           </>}
           {/* Meta */}
           <div style={{height:1,background:"#F1F5F9",margin:"12px 0 10px"}}/>
@@ -267,9 +463,9 @@ function DealCard({ deal }) {
   );
 }
 
-function LuckyModal({ deal, onClose, onReroll }) {
+function LuckyModal({ deal, onClose, onReroll }: { deal: Deal; onClose: () => void; onReroll: () => void; }) {
   if (!deal) return null;
-  const ac = CAT_A[deal.category]||C.accent;
+  const ac = CAT_A[deal.category as keyof typeof CAT_A]||C.accent;
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(5px)",
       display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}}
@@ -304,7 +500,7 @@ function LuckyModal({ deal, onClose, onReroll }) {
           <p style={{margin:"0 0 14px",fontSize:12,fontWeight:600,color:C.green}}>You save {deal.saved}</p>
           <div style={{background:"#F8FAFC",borderRadius:8,padding:"12px 12px 6px",marginBottom:14,border:`1px solid ${C.border}`}}>
             <p style={{margin:"0 0 8px",fontSize:10.5,fontWeight:700,color:C.t3,textTransform:"uppercase",letterSpacing:"0.07em"}}>All codes found</p>
-            {deal.codes.map((en,i)=><CodeRow key={i} entry={en} url={deal.url}/>)}
+            {deal.codes.map((en: DealCode, i: number)=><CodeRow key={i} entry={en} url={deal.url}/>)}
           </div>
           <div style={{display:"flex",gap:8}}>
             <button onClick={onReroll} style={{
@@ -337,7 +533,7 @@ export default function App() {
   const [tab, setTab] = useState("All");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("best");
-  const [lucky, setLucky] = useState(null);
+  const [lucky, setLucky] = useState<Deal | null>(null);
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -406,7 +602,7 @@ export default function App() {
           {CATS.map(c=>{
             const active=tab===c;
             const isHot=c==="🔥 Hot Deals";
-            const ac=isHot?C.red:(CAT_A[c]||C.accent);
+            const ac=isHot?C.red:(CAT_A[c as keyof typeof CAT_A]||C.accent);
             return(
               <button key={c} onClick={()=>setTab(c)} style={{
                 padding:"11px 14px",fontSize:13,fontWeight:active?700:400,
